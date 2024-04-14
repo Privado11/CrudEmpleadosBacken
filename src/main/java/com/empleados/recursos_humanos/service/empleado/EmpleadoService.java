@@ -1,21 +1,22 @@
 package com.empleados.recursos_humanos.service.empleado;
 
-import com.empleados.recursos_humanos.modelo.Empleado;
+import com.empleados.recursos_humanos.dto.empleado.EmpleadoDto;
+import com.empleados.recursos_humanos.dto.empleado.EmpleadoToSaveDto;
 
 import java.util.List;
 
 public interface EmpleadoService {
-    public List<Empleado> getAllEmpleados();
+    public List<EmpleadoDto> getAllEmpleados();
 
-    public Empleado buscarEmpleadoPorId(Long idEmpleado);
+    public EmpleadoDto buscarEmpleadoPorId(Long idEmpleado);
 
-    public Empleado guardarEmpleado(Empleado empleado);
+    public EmpleadoDto guardarEmpleado(EmpleadoToSaveDto empleado);
 
     public void eliminarEmpleado(Long idEmpleado);
 
-    public Empleado editarEmpleado(Long idEmpleado,Empleado empleado);
+    public EmpleadoDto editarEmpleado(Long idEmpleado, EmpleadoToSaveDto empleado);
 
-    public List<Empleado> buscarEmpleadoPorDepartamento(String nombreDepartamento);
+    public List<EmpleadoDto> buscarEmpleadoPorDepartamento(String nombreDepartamento);
 
-    public List<Empleado> buscarEmpleadoPorCargo(String nombreCargo);
+    public List<EmpleadoDto> buscarEmpleadoPorCargo(String nombreCargo);
 }

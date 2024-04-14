@@ -30,8 +30,8 @@ public class Empleado {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
-    private String departamento;
+    @OneToOne(mappedBy = "empleado")
+    private Departamento departamento;
 
     private Double sueldo;
 

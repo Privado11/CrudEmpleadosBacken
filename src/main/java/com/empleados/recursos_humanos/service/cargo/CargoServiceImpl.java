@@ -1,5 +1,8 @@
 package com.empleados.recursos_humanos.service.cargo;
 
+import com.empleados.recursos_humanos.dto.cargo.CargoDto;
+import com.empleados.recursos_humanos.dto.cargo.CargoMapper;
+import com.empleados.recursos_humanos.dto.cargo.CargoToSaveDto;
 import com.empleados.recursos_humanos.exception.RecursoNoEncontradoException;
 import com.empleados.recursos_humanos.modelo.Cargo;
 import com.empleados.recursos_humanos.repository.CargoRepository;
@@ -10,22 +13,35 @@ import java.util.List;
 
 @Service
 public class CargoServiceImpl implements CargoService{
-    @Autowired
+
     private CargoRepository cargoRepository;
+    private CargoMapper cargoMapper;
 
-    @Override
-    public List<Cargo> getAllCargos() {
-        return cargoRepository.findAll();
+    @Autowired
+    public CargoServiceImpl(CargoRepository cargoRepository, CargoMapper cargoMapper) {
+        this.cargoRepository = cargoRepository;
+        this.cargoMapper = cargoMapper;
     }
 
     @Override
-    public Cargo buscarCargoPorId(Long idCargo) {
-        return cargoRepository.findById(idCargo).orElseThrow(() -> new RecursoNoEncontradoException("Cargo con id " + idCargo + " no encontrado"));
+    public List<CargoDto> getAllCargos() {
+        return cargoRepository.findAll()
+                .stream()
+                .map(cargo -> cargoMapper.toDto(cargo))
+                .toList();
     }
 
     @Override
-    public Cargo guardarCargo(Cargo cargo) {
-        return cargoRepository.save(cargo);
+    public CargoDto buscarCargoPorId(Long idCargo) {
+        Cargo cargoE = cargoRepository.findById(idCargo).orElseThrow(() -> new RecursoNoEncontradoException("Cargo con id " + idCargo + " no encontrado"));
+
+        return cargoMapper.toDto(cargoE);
+    }
+
+    @Override
+    public CargoDto guardarCargo(CargoToSaveDto cargo) {
+        Cargo cargoG = cargoMapper.toSaveToEntity(cargo);
+        return cargoMapper.toDto(cargoRepository.save(cargoG));
     }
 
     @Override
@@ -35,19 +51,19 @@ public class CargoServiceImpl implements CargoService{
     }
 
     @Override
-    public Cargo editarCargo(Long idCargo, Cargo cargo) {
+    public CargoDto editarCargo(Long idCargo, CargoToSaveDto cargo) {
         return cargoRepository.findById(idCargo)
                 .map(cargoAux -> {
-                    cargoAux.setNombre(cargo.getNombre());
-                    cargoAux.setDepartamento(cargo.getDepartamento());
-                    cargo.setEmpleados(cargo.getEmpleados());
-                    return cargoRepository.save(cargoAux);
+                    cargoAux.setNombre(cargo.nombre());
+                    cargoAux.setDepartamento(cargo.departamento());
+
+                    return cargoMapper.toDto(cargoRepository.save(cargoAux));
                 }).orElseThrow(() -> new RecursoNoEncontradoException("Cargo con id " + idCargo + " no encontrado"));
     }
 
     @Override
-    public Cargo buscarCargoPorNombre(String nombreCargo) {
-        return cargoRepository.findByNombreLike(nombreCargo);
+    public CargoDto buscarCargoPorNombre(String nombreCargo) {
+        return cargoMapper.toDto(cargoRepository.findByNombreLike(nombreCargo));
     }
 
 }

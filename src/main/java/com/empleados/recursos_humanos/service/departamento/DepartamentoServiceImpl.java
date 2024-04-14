@@ -1,5 +1,8 @@
 package com.empleados.recursos_humanos.service.departamento;
 
+import com.empleados.recursos_humanos.dto.departamento.DepartamentoDto;
+import com.empleados.recursos_humanos.dto.departamento.DepartamentoMapper;
+import com.empleados.recursos_humanos.dto.departamento.DepartamentoToSaveDto;
 import com.empleados.recursos_humanos.exception.RecursoNoEncontradoException;
 import com.empleados.recursos_humanos.modelo.Departamento;
 import com.empleados.recursos_humanos.repository.DepartamentoRepository;
@@ -11,23 +14,36 @@ import java.util.List;
 @Service
 public class DepartamentoServiceImpl implements DepartamentoService{
 
-    @Autowired
+
     private DepartamentoRepository departamentoRepository;
+    private DepartamentoMapper departamentoMapper;
 
-    @Override
-    public List<Departamento> getAllDepartamentos() {
-        return departamentoRepository.findAll();
+    @Autowired
+    public DepartamentoServiceImpl(DepartamentoRepository departamentoRepository, DepartamentoMapper departamentoMapper) {
+        this.departamentoRepository = departamentoRepository;
+        this.departamentoMapper = departamentoMapper;
     }
 
     @Override
-    public Departamento buscarDepartamentoPorId(Long idDepartamento) {
-        return departamentoRepository.findById(idDepartamento)
+    public List<DepartamentoDto> getAllDepartamentos() {
+        return departamentoRepository.findAll().stream()
+                .map(departamento -> departamentoMapper.toDto(departamento))
+                .toList();
+    }
+
+    @Override
+    public DepartamentoDto buscarDepartamentoPorId(Long idDepartamento) {
+        Departamento departamentoG = departamentoRepository.findById(idDepartamento)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Departamento con id " + idDepartamento + " no encontrado"));
+
+        return departamentoMapper.toDto(departamentoG);
     }
 
     @Override
-    public Departamento guardarDepartamento(Departamento departamento) {
-        return departamentoRepository.save(departamento);
+    public DepartamentoDto guardarDepartamento(DepartamentoToSaveDto departamento) {
+        Departamento departamentoG = departamentoMapper.toSaveDtoToEntity(departamento);
+
+        return departamentoMapper.toDto(departamentoRepository.save(departamentoG));
     }
 
     @Override
@@ -38,19 +54,17 @@ public class DepartamentoServiceImpl implements DepartamentoService{
     }
 
     @Override
-    public Departamento editarDepartamento(Long idDepartamento, Departamento departamento) {
+    public DepartamentoDto editarDepartamento(Long idDepartamento, DepartamentoToSaveDto departamento) {
         return departamentoRepository.findById(idDepartamento)
                 .map(departamentoAux -> {
-                    departamentoAux.setNombre(departamento.getNombre());
-                    departamentoAux.setJefeDepartamento(departamento.getJefeDepartamento());
-                    departamentoAux.setCargos(departamento.getCargos());
+                    departamentoAux.setNombre(departamento.nombre());
 
-                    return departamentoRepository.save(departamentoAux);
+                    return departamentoMapper.toDto(departamentoRepository.save(departamentoAux));
                 }).orElseThrow(() -> new RecursoNoEncontradoException("Departamento con id " + idDepartamento + " no encontrado"));
     }
 
     @Override
-    public Departamento buscarDepartamentoPorNombre(String nombreDepartamento) {
-        return departamentoRepository.findByNombreLike(nombreDepartamento);
+    public DepartamentoDto buscarDepartamentoPorNombre(String nombreDepartamento) {
+        return departamentoMapper.toDto(departamentoRepository.findByNombreLike(nombreDepartamento));
     }
 }

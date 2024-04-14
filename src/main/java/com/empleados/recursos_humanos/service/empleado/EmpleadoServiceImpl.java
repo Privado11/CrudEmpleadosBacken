@@ -1,5 +1,8 @@
 package com.empleados.recursos_humanos.service.empleado;
 
+import com.empleados.recursos_humanos.dto.empleado.EmpleadoDto;
+import com.empleados.recursos_humanos.dto.empleado.EmpleadoMapper;
+import com.empleados.recursos_humanos.dto.empleado.EmpleadoToSaveDto;
 import com.empleados.recursos_humanos.exception.RecursoNoEncontradoException;
 import com.empleados.recursos_humanos.modelo.Empleado;
 import com.empleados.recursos_humanos.repository.EmpleadoRepository;
@@ -11,22 +14,38 @@ import java.util.List;
 @Service
 public class EmpleadoServiceImpl implements EmpleadoService{
 
-    @Autowired
+
     private EmpleadoRepository empleadoRepository;
+    private EmpleadoMapper empleadoMapper;
 
-    @Override
-    public List<Empleado> getAllEmpleados() {
-        return empleadoRepository.findAll();
+    @Autowired
+    public EmpleadoServiceImpl(EmpleadoRepository empleadoRepository, EmpleadoMapper empleadoMapper) {
+        this.empleadoRepository = empleadoRepository;
+        this.empleadoMapper = empleadoMapper;
     }
 
     @Override
-    public Empleado buscarEmpleadoPorId(Long idEmpleado) {
-        return empleadoRepository.findById(idEmpleado).orElseThrow(()->new RecursoNoEncontradoException("Empleado con id" + idEmpleado + "no encontrado"));
+    public List<EmpleadoDto> getAllEmpleados() {
+        return empleadoRepository.findAll()
+                .stream()
+                .map(empleado -> empleadoMapper.toDto(empleado))
+                .toList();
     }
 
     @Override
-    public Empleado guardarEmpleado(Empleado empleado) {
-        return empleadoRepository.save(empleado);
+    public EmpleadoDto buscarEmpleadoPorId(Long idEmpleado) {
+        Empleado empleadoE = empleadoRepository.findById(idEmpleado)
+                .orElseThrow(()->
+                        new RecursoNoEncontradoException("Empleado con id" + idEmpleado + "no encontrado")
+                );
+
+        return empleadoMapper.toDto(empleadoE);
+    }
+
+    @Override
+    public EmpleadoDto guardarEmpleado(EmpleadoToSaveDto empleado) {
+        Empleado empleadoG = empleadoMapper.toEmpleadoSaveDtoToEntity(empleado);
+        return empleadoMapper.toDto(empleadoRepository.save(empleadoG));
     }
 
     @Override
@@ -36,30 +55,36 @@ public class EmpleadoServiceImpl implements EmpleadoService{
     }
 
     @Override
-    public Empleado editarEmpleado(Long idEmpleado, Empleado empleado) {
+    public EmpleadoDto editarEmpleado(Long idEmpleado, EmpleadoToSaveDto empleado) {
         return empleadoRepository.findById(idEmpleado)
         .map(empleadoAux->{
-            empleadoAux.setCodigo(empleado.getCodigo());
-            empleadoAux.setNombre(empleado.getNombre());
-            empleadoAux.setApellido(empleado.getApellido());
-            empleadoAux.setDireccion(empleado.getDireccion());
-            empleadoAux.setTelefono(empleado.getTelefono());
-            empleadoAux.setEmail(empleado.getEmail());
-            empleadoAux.setDepartamento(empleado.getDepartamento());
-            empleadoAux.setSueldo(empleado.getSueldo());
-            empleadoAux.setCargo(empleado.getCargo());
+            empleadoAux.setCodigo(empleado.codigo());
+            empleadoAux.setNombre(empleado.nombre());
+            empleadoAux.setApellido(empleado.apellido());
+            empleadoAux.setDireccion(empleado.direccion());
+            empleadoAux.setTelefono(empleado.telefono());
+            empleadoAux.setEmail(empleado.email());
+            empleadoAux.setSueldo(empleado.sueldo());
+            empleadoAux.setCargo(empleado.cargo());
 
-            return empleadoRepository.save(empleadoAux);
+            Empleado empleadoG = empleadoRepository.save(empleadoAux);
+            return empleadoMapper.toDto(empleadoG);
         }).orElseThrow(()->new RecursoNoEncontradoException("Empleado con id" + idEmpleado + "no encontrado"));
     }
 
     @Override
-    public List<Empleado> buscarEmpleadoPorDepartamento(String nombreDepartamento) {
-        return empleadoRepository.findByCargo_Departamento_Nombre(nombreDepartamento);
+    public List<EmpleadoDto> buscarEmpleadoPorDepartamento(String nombreDepartamento) {
+        return empleadoRepository.findByCargo_Departamento_Nombre(nombreDepartamento)
+                .stream()
+                .map(empleado -> empleadoMapper.toDto(empleado))
+                .toList();
     }
 
     @Override
-    public List<Empleado> buscarEmpleadoPorCargo(String nombreCargo) {
-        return empleadoRepository.findByCargo_Nombre(nombreCargo);
+    public List<EmpleadoDto> buscarEmpleadoPorCargo(String nombreCargo) {
+        return empleadoRepository.findByCargo_Nombre(nombreCargo)
+                .stream()
+                .map(empleado -> empleadoMapper.toDto(empleado))
+                .toList();
     }
 }

@@ -1,5 +1,7 @@
 package com.empleados.recursos_humanos.controller;
 
+import com.empleados.recursos_humanos.dto.cargo.CargoDto;
+import com.empleados.recursos_humanos.dto.cargo.CargoToSaveDto;
 import com.empleados.recursos_humanos.modelo.Cargo;
 import com.empleados.recursos_humanos.service.cargo.CargoService;
 import org.slf4j.Logger;
@@ -20,30 +22,30 @@ public class CargoController {
     private CargoService cargoService;
 
     @GetMapping()
-    public ResponseEntity<List<Cargo>> obtenerCargos() {
-        List<Cargo> cargos = cargoService.getAllCargos();
+    public ResponseEntity<List<CargoDto>> obtenerCargos() {
+        List<CargoDto> cargos = cargoService.getAllCargos();
         cargos.forEach(cargo -> logger.info(cargo.toString()));
         return ResponseEntity.ok().body(cargos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cargo> obtenerCargoPorId(@PathVariable("id") Long idCargo) {
-        Cargo cargo = cargoService.buscarCargoPorId(idCargo);
+    public ResponseEntity<CargoDto> obtenerCargoPorId(@PathVariable("id") Long idCargo) {
+        var cargo = cargoService.buscarCargoPorId(idCargo);
         logger.info("Cargo encontrado: " + cargo);
         return ResponseEntity.ok().body(cargo);
     }
 
     @PostMapping()
-    public ResponseEntity<Cargo> agregarCargo(@RequestBody Cargo cargo) {
+    public ResponseEntity<CargoDto> agregarCargo(@RequestBody CargoToSaveDto cargo) {
         logger.info("Cargo a guardar: " + cargo);
-        Cargo cargoG = cargoService.guardarCargo(cargo);
+        var cargoG = cargoService.guardarCargo(cargo);
         return ResponseEntity.ok().body(cargoG);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cargo> editarCargo(@PathVariable("id") Long idCargo, @RequestBody Cargo cargo) {
+    public ResponseEntity<CargoDto> editarCargo(@PathVariable("id") Long idCargo, @RequestBody CargoToSaveDto cargo) {
         logger.info("Cargo editado: " + cargo);
-        Cargo cargoE = cargoService.editarCargo(idCargo, cargo);
+        var cargoE = cargoService.editarCargo(idCargo, cargo);
         return ResponseEntity.ok().body(cargoE);
     }
 
@@ -54,8 +56,8 @@ public class CargoController {
     }
 
     @GetMapping("/nombre/{nombreCargo}")
-    public ResponseEntity<Cargo> buscarCargoPorNombre(@PathVariable("nombreCargo") String nombreCargo) {
-        Cargo cargo = cargoService.buscarCargoPorNombre(nombreCargo);
+    public ResponseEntity<CargoDto> buscarCargoPorNombre(@PathVariable("nombreCargo") String nombreCargo) {
+        var cargo = cargoService.buscarCargoPorNombre(nombreCargo);
         logger.info("Cargo encontrado: " + cargo);
         return ResponseEntity.ok().body(cargo);
     }

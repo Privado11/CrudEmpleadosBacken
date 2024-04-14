@@ -1,5 +1,7 @@
 package com.empleados.recursos_humanos.controller;
 
+import com.empleados.recursos_humanos.dto.empleado.EmpleadoDto;
+import com.empleados.recursos_humanos.dto.empleado.EmpleadoToSaveDto;
 import com.empleados.recursos_humanos.modelo.Empleado;
 import com.empleados.recursos_humanos.service.empleado.EmpleadoService;
 import org.slf4j.Logger;
@@ -22,30 +24,30 @@ public class EmpleadoController {
     private EmpleadoService empleadoService;
 
     @GetMapping()
-    public ResponseEntity<List<Empleado>> obtenerEmpleados(){
+    public ResponseEntity<List<EmpleadoDto>> obtenerEmpleados(){
         var empleados = empleadoService.getAllEmpleados();
         empleados.forEach((empleado -> logger.info(empleado.toString())));
         return ResponseEntity.ok().body(empleados);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Empleado> obtenerEmpleadoPorId(@PathVariable("id") Long idEmpleado){
+    public ResponseEntity<EmpleadoDto> obtenerEmpleadoPorId(@PathVariable("id") Long idEmpleado){
         var empleado = empleadoService.buscarEmpleadoPorId(idEmpleado);
         logger.info("Empleado encontrado: " + empleado);
         return ResponseEntity.ok().body(empleado);
     }
 
     @PostMapping()
-    public ResponseEntity<Empleado> agregarEmpleado(@RequestBody Empleado empleado){
+    public ResponseEntity<EmpleadoDto> agregarEmpleado(@RequestBody EmpleadoToSaveDto empleado){
         logger.info("Empleado a guardar: " + empleado);
         var empleadoG = empleadoService.guardarEmpleado(empleado);
         return ResponseEntity.ok().body(empleadoG);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Empleado> editarEmpleado(@PathVariable("id") Long idEmpleado, @RequestBody Empleado empleado){
+    public ResponseEntity<EmpleadoDto> editarEmpleado(@PathVariable("id") Long idEmpleado, @RequestBody EmpleadoToSaveDto empleado){
         logger.info("Empleado editado: " + empleado);
-        Empleado empleadoE = empleadoService.editarEmpleado(idEmpleado,empleado);
+        var empleadoE = empleadoService.editarEmpleado(idEmpleado,empleado);
         return ResponseEntity.ok().body(empleadoE);
     }
 
@@ -56,14 +58,14 @@ public class EmpleadoController {
     }
 
     @GetMapping("/departamento/{nombreDepartamento}")
-    public ResponseEntity<List<Empleado>> buscarEmpleadoPorDepartamento(@PathVariable("nombreDepartamento") String nombreDepartamento){
+    public ResponseEntity<List<EmpleadoDto>> buscarEmpleadoPorDepartamento(@PathVariable("nombreDepartamento") String nombreDepartamento){
         var empleados = empleadoService.buscarEmpleadoPorDepartamento(nombreDepartamento);
         empleados.forEach((empleado -> logger.info(empleado.toString())));
         return ResponseEntity.ok().body(empleados);
     }
 
     @GetMapping("/cargo/{nombreCargo}")
-    public ResponseEntity<List<Empleado>> buscarEmpleadoPorCargo(@PathVariable("nombreCargo") String nombreCargo){
+    public ResponseEntity<List<EmpleadoDto>> buscarEmpleadoPorCargo(@PathVariable("nombreCargo") String nombreCargo){
         var empleados = empleadoService.buscarEmpleadoPorCargo(nombreCargo);
         empleados.forEach((empleado -> logger.info(empleado.toString())));
         return ResponseEntity.ok().body(empleados);

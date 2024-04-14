@@ -1,20 +1,22 @@
 package com.empleados.recursos_humanos.service.cargo;
 
-import com.empleados.recursos_humanos.modelo.Cargo;
+import com.empleados.recursos_humanos.dto.cargo.CargoDto;
+import com.empleados.recursos_humanos.dto.cargo.CargoToSaveDto;
+
 
 import java.util.List;
 
 public interface CargoService {
-    public List<Cargo> getAllCargos();
+    public List<CargoDto> getAllCargos();
 
-    public Cargo buscarCargoPorId(Long idCargo);
+    public CargoDto buscarCargoPorId(Long idCargo);
 
-    public Cargo guardarCargo(Cargo cargo);
+    public CargoDto guardarCargo(CargoToSaveDto cargo);
 
     public void eliminarCargo(Long idCargo);
 
-    public Cargo editarCargo(Long idCargo, Cargo cargo);
+    public CargoDto editarCargo(Long idCargo, CargoToSaveDto cargo);
 
-    public Cargo buscarCargoPorNombre(String nombreCargo);
+    public CargoDto buscarCargoPorNombre(String nombreCargo);
 
 }

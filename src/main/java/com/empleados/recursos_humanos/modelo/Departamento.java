@@ -22,7 +22,7 @@ public class Departamento {
 
     @OneToOne
     @JoinColumn(name = "id_jefe")
-    private Empleado jefeDepartamento;
+    private Empleado empleado;
 
     @OneToMany(mappedBy = "departamento")
     private List<Cargo> cargos;
